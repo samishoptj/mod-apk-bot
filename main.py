@@ -13,7 +13,10 @@ from PIL import Image
 import database 
 
 CHANNEL_ID = -1003836347870
-
+def save_user(user_id):
+    db.collection("users").document(str(user_id)).set({
+        "user_id": user_id
+    })
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = os.getenv("ADMIN_ID")
