@@ -11,8 +11,23 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dotenv import load_dotenv
 from PIL import Image
 import database 
-
+from keep_alive import keep_alive
 CHANNEL_ID = -1003836347870
+from firebase_admin import credentials, firestore
+
+# Firebase ulash
+cred = credentials.Certificate("firebase.json")
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
+
+# TEST: databasega yozish
+db.collection("users").add({
+    "name": "Samir",
+    "status": "bot ishladi"
+})
+
+print("Firebase ulandi!")
 def save_user(user_id):
     db.collection("users").document(str(user_id)).set({
         "user_id": user_id
@@ -330,7 +345,7 @@ async def main():
     print("Bot ishga tushdi...")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
-
+keep_alive()
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     asyncio.run(main())
