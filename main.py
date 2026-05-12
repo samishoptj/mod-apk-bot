@@ -1,3 +1,6 @@
+
+Copy
+
 import asyncio
 import logging
 import os
@@ -43,37 +46,34 @@ class BotStates(StatesGroup):
     waiting_for_apk_name = State()
     waiting_for_delete_name = State()
 
+class MxStates(StatesGroup):
+    waiting_channel = State()
+    waiting_dates = State()
+    waiting_confirm = State()
+
 MESSAGES = {
     'uz': {
-        'welcome': "Salom! Men aqlli APK botman. 🤖\n\n1️⃣ O'yin nomini yozing\n2️⃣ O'yinni tasvirlang\n3️⃣ Skrinshot yuboring!",
-        'not_found': f"Afsuski, bu ilova bazada yo'q. Admin tez orada qo'shadi! 👉 <a href='tg://user?id={ADMIN_ID}'>Admin</a>",
+        'welcome': "Salom! Men aqlli APK botman. 🤖\n\nMenga quyidagicha murojaat qilishingiz mumkin:\n1️⃣ O'yin nomini yozing (masalan: Minecraft)\n2️⃣ O'yinni tasvirlang (masalan: 'poyga o'yini')\n3️⃣ Skrinshot yuboring!",
+        'not_found': f"Afsuski, bu ilova hozircha bazada yo'q. Men adminga xabar berdim, tez orada qo'shiladi! \n\nXavotir olmang, admin juda tez vaqt ichida bu ilovani qo'shadi. Yoki agar xohlasangiz, o'zingiz to'g'ridan-to'g'ri admin bilan bog'lanishingiz mumkin 👉 <a href='tg://user?id={ADMIN_ID}'>Admin Profiliga O'tish</a>",
         'searching': "🔍 Qidiryapman...",
-        'not_in_db': "Bazada yo'q",
-        'creator': "Meni Sami yaratgan.",
-        'lang_name': 'o\'zbek'
+        'lang_name': 'Uzbek'
     },
     'ru': {
-        'welcome': "Привет! Я умный APK бот. 🤖\n\n1️⃣ Напишите название игры\n2️⃣ Опишите игру\n3️⃣ Пришлите скриншот!",
-        'not_found': f"Этого приложения нет в базе. Админ скоро добавит! 👉 <a href='tg://user?id={ADMIN_ID}'>Админ</a>",
+        'welcome': "Привет! Я умный APK бот. 🤖\n\nВы можете искать так:\n1️⃣ Напишите название\n2️⃣ Опишите игру\n3️⃣ Пришлите скриншот!",
+        'not_found': f"Этого приложения пока нет в базе. Я сообщил админу, скоро добавим! Вы также можете написать админу напрямую 👉 <a href='tg://user?id={ADMIN_ID}'>Связаться с Админом</a>",
         'searching': "🔍 Ищу...",
-        'not_in_db': "Нет в базе",
-        'creator': "Меня создал Сами.",
-        'lang_name': 'русский'
+        'lang_name': 'Russian'
     },
     'tj': {
-        'welcome': "Салом! Ман боти APK ҳастам. 🤖\n\n1️⃣ Номи бозиро нависед\n2️⃣ Бозиро тавсиф кунед\n3️⃣ Скриншот фиристед!",
-        'not_found': f"Ин барнома дар база нест. Админ зуд илова мекунад! 👉 <a href='tg://user?id={ADMIN_ID}'>Админ</a>",
+        'welcome': "Салом! Ман боти интеллектуалии APK ҳастам. 🤖",
+        'not_found': f"Мутаассифона, ин барнома дар база нест. Шумо метавонед ба админ нависед 👉 <a href='tg://user?id={ADMIN_ID}'>Админ</a>",
         'searching': "🔍 Ҷустуҷӯ дорам...",
-        'not_in_db': "Дар база нест",
-        'creator': "Маро Сами офаридааст.",
-        'lang_name': 'тоҷикӣ'
+        'lang_name': 'Tajik'
     },
     'en': {
-        'welcome': "Hello! I am a smart APK bot. 🤖\n\n1️⃣ Write the game name\n2️⃣ Describe the game\n3️⃣ Send a screenshot!",
-        'not_found': f"This app is not in the database. Admin will add it soon! 👉 <a href='tg://user?id={ADMIN_ID}'>Admin</a>",
+        'welcome': "Hello! I am a smart APK bot. 🤖",
+        'not_found': f"Unfortunately, this app is not in the database yet. Contact admin 👉 <a href='tg://user?id={ADMIN_ID}'>Admin</a>",
         'searching': "🔍 Searching...",
-        'not_in_db': "Not in database",
-        'creator': "I was created by Sami.",
         'lang_name': 'English'
     }
 }
@@ -265,29 +265,28 @@ async def handle_text_ai(message: types.Message, state: FSMContext):
 
     await bot.send_chat_action(chat_id=message.chat.id, action=ChatAction.TYPING)
     
-    creator_info = MESSAGES[lang_code]['creator']
     prompt = f"""
-    Sen Telegram botning aqlli yordamchisissan. 
-    MUHIM: Faqat {ai_lang_name} tilida javob ber. Boshqa hech qanday tilda yozma. Hech qachon!
-    Foydalanuvchi yozdi: '{query}'
+    Sen Telegram botning o'ta aqlli Sun'iy Intellekti (AI) yordamchisisan.
+    Foydalanuvchi tili: {ai_lang_name}. Foydalanuvchi yozdi: '{query}'
 
-    Agar foydalanuvchi "kim yaratgan", "who made you", "кто тебя создал", "ки туро офарид" kabi savol bersa:
-    SUHBAT: {creator_info}
+    VAZIFANG quyidagi 3 ta holatdan eng mosini tanlab, STROGIY FORMATDA javob berish:
 
-    Qolgan holatlarda quyidagi 3 ta formatdan birini tanla:
+    1-HOLAT: Agar foydalanuvchi ilova/o'yin nomini yozgan bo'lsa (hatto gap ichida bo'lsa ham: "salom menga GTA kerak").
+    Format:
+    NOM: [Faqat o'yin nomi] | JAVOB: [Suhbatdosh sifatida qisqa, do'stona javob]
 
-    1-HOLAT: Agar o'yin/ilova nomi yozilgan bo'lsa:
-    NOM: [Faqat o'yin nomi] | JAVOB: [Qisqa do'stona javob, faqat {ai_lang_name} tilida]
-
-    2-HOLAT: Agar o'yinni ta'riflasa yoki maslahat so'rasa:
+    2-HOLAT: Agar foydalanuvchi nomini bilmasdan o'yinni ta'riflasa yoki maslahat so'rasa.
+    Format:
     TA'RIF: 
-    [Qisqa gap, faqat {ai_lang_name} tilida]
+    [Do'stona qisqa gap]
     1. <b>[Nomi 1]</b> — [Qisqa ta'rif]
     2. <b>[Nomi 2]</b> — [Qisqa ta'rif]
     3. <b>[Nomi 3]</b> — [Qisqa ta'rif]
+    [Shulardan qaysi biri kerak deb so'ra]
 
-    3-HOLAT: Agar salom, qandaysan kabi suhbat bo'lsa:
-    SUHBAT: [Do'stona qisqa javob, faqat {ai_lang_name} tilida]
+    3-HOLAT: Agar u shunchaki "salom", "qandaysan" desa yoki oldingi o'yinlarni "yo'q bular emas" deb rad etsa.
+    Format:
+    SUHBAT: [Suhbatga mos do'stona javob. Agar rad etsa: "Tushunarli, adminga xabar berdim" mazmunida yoz].
     """
     
     try:
@@ -331,6 +330,212 @@ async def handle_text_ai(message: types.Message, state: FSMContext):
         
     else:
         await message.answer(ai_answer, parse_mode="HTML")
+
+# ================= /mx - KANALDAN OMMAVIY SAQLASH =================
+@dp.message(Command("mx"), F.from_user.id == int(ADMIN_ID) if ADMIN_ID else False)
+async def mx_start(message: types.Message, state: FSMContext):
+    await message.answer(
+        "📥 <b>Kanaldan ommaviy saqlash</b>\n\n"
+        "Qaysi kanaldan olish kerak?\n"
+        "Kanal username ni yozing (masalan: @EasyAPK yoki EasyAPK):",
+        parse_mode="HTML"
+    )
+    await state.set_state(MxStates.waiting_channel)
+
+@dp.message(MxStates.waiting_channel, F.text)
+async def mx_get_channel(message: types.Message, state: FSMContext):
+    channel = message.text.strip().lstrip("@")
+    await state.update_data(mx_channel=channel)
+    await message.answer(
+        f"✅ Kanal: @{channel}\n\n"
+        "Endi sana oralig'ini kiriting:\n"
+        "Format: <b>YYYY.MM.DD - YYYY.MM.DD</b>\n"
+        "Misol: <b>2024.05.21 - 2026.05.01</b>",
+        parse_mode="HTML"
+    )
+    await state.set_state(MxStates.waiting_dates)
+
+@dp.message(MxStates.waiting_dates, F.text)
+async def mx_get_dates(message: types.Message, state: FSMContext):
+    from datetime import datetime
+    text = message.text.strip()
+    try:
+        parts = text.replace(" ", "").split("-")
+        date_from = datetime.strptime(parts[0], "%Y.%m.%d")
+        date_to = datetime.strptime(parts[1], "%Y.%m.%d")
+    except:
+        await message.answer("❌ Format noto'g'ri! Qayta yozing:\nMisol: 2024.05.21 - 2026.05.01")
+        return
+
+    data = await state.get_data()
+    channel = data.get("mx_channel")
+    await state.update_data(mx_date_from=date_from.isoformat(), mx_date_to=date_to.isoformat())
+
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        types.InlineKeyboardButton(text="✅ Ha, boshlash", callback_data="mx_confirm"),
+        types.InlineKeyboardButton(text="❌ Bekor qilish", callback_data="mx_cancel")
+    )
+    await message.answer(
+        f"📋 <b>Tasdiqlang:</b>\n\n"
+        f"📡 Kanal: @{channel}\n"
+        f"📅 Dan: {date_from.strftime('%d.%m.%Y')}\n"
+        f"📅 Gacha: {date_to.strftime('%d.%m.%Y')}\n\n"
+        f"Har fayl 2-3 sekund oraliq bilan saqlanadi.",
+        parse_mode="HTML",
+        reply_markup=builder.as_markup()
+    )
+    await state.set_state(MxStates.waiting_confirm)
+
+@dp.callback_query(F.data == "mx_cancel")
+async def mx_cancel(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.edit_text("❌ Bekor qilindi.")
+    await callback.answer()
+
+@dp.callback_query(F.data == "mx_confirm")
+async def mx_confirm(callback: types.CallbackQuery, state: FSMContext):
+    from datetime import datetime, timezone
+    data = await state.get_data()
+    channel = data.get("mx_channel")
+    date_from = datetime.fromisoformat(data.get("mx_date_from"))
+    date_to = datetime.fromisoformat(data.get("mx_date_to"))
+    await state.clear()
+
+    await callback.message.edit_text(
+        f"⏳ Jarayon boshlandi...\n@{channel} kanalidan fayllar saqlanmoqda."
+    )
+    await callback.answer()
+
+    saved = 0
+    skipped = 0
+    errors = 0
+
+    try:
+        # Kanalning barcha postlarini ko'rib chiqish
+        offset_id = 0
+        running = True
+
+        while running:
+            try:
+                messages = await bot.get_updates(offset=offset_id, limit=100, timeout=5)
+            except Exception:
+                break
+
+            # Kanal postlarini to'g'ridan to'g'ri olish uchun
+            # Telegram Bot API orqali kanal tarixini o'qib bo'lmaydi
+            # Shuning uchun forward usulini ishlatamiz
+            break
+
+        # To'g'ri usul: kanal postlarini bot orqali forward qilib olish
+        # Bu Telegram Bot API da mavjud emas — faqat Userbot orqali mumkin
+        # Shuning uchun biz mavjud postlarni ID bo'yicha sinab ko'ramiz
+
+        await bot.send_message(
+            ADMIN_ID,
+            "⚠️ <b>Muhim eslatma:</b>\n\n"
+            "Telegram Bot API kanal tarixini o'qishga ruxsat bermaydi.\n\n"
+            "Bu funksiya uchun quyidagi yo'l ishlaydi:\n"
+            "1. @EasyAPK kanalida mavjud postlarni forward qiling\n"
+            "2. Yoki post ID oralig'ini bering\n\n"
+            "Post ID dan qidiruv usulini ishlatamizmi?",
+            parse_mode="HTML"
+        )
+
+        # Post ID bo'yicha sinab ko'rish
+        # Kanal username dan chat ni olish
+        try:
+            chat = await bot.get_chat(f"@{channel}")
+        except Exception as e:
+            await bot.send_message(ADMIN_ID, f"❌ Kanal topilmadi: @{channel}\nXato: {e}")
+            return
+
+        # Post ID oralig'ini topish uchun kichik ID dan boshlash
+        start_id = 1
+        end_id = 10000
+
+        status_msg = await bot.send_message(
+            ADMIN_ID,
+            f"🔄 Qidirish boshlandi...\n@{channel} kanal ID: {chat.id}"
+        )
+
+        for msg_id in range(start_id, end_id + 1):
+            try:
+                # Xabarni forward qilib ko'rish
+                forwarded = await bot.forward_message(
+                    chat_id=ADMIN_ID,
+                    from_chat_id=chat.id,
+                    message_id=msg_id
+                )
+
+                # Sana tekshirish
+                msg_date = forwarded.date
+                if msg_date:
+                    msg_date_naive = msg_date.replace(tzinfo=None)
+                    if not (date_from <= msg_date_naive <= date_to):
+                        # Sana oralig'idan tashqarida — o'chirib yuborish
+                        try:
+                            await bot.delete_message(ADMIN_ID, forwarded.message_id)
+                        except:
+                            pass
+                        await asyncio.sleep(0.5)
+                        continue
+
+                # APK fayl bormi?
+                if forwarded.document:
+                    file_id = forwarded.document.file_id
+                    game_name = forwarded.caption or forwarded.document.file_name or f"APK_{msg_id}"
+                    # Birinchi qatorni nom sifatida olish
+                    game_name = game_name.split('\n')[0].strip()[:100]
+
+                    # Yopiq kanalga saqlash
+                    sent = await bot.send_document(
+                        CHANNEL_ID,
+                        file_id,
+                        caption=f"📦 {game_name}"
+                    )
+                    stored_file_id = sent.document.file_id
+
+                    # Bazaga saqlash
+                    await database.add_app(game_name, stored_file_id, game_name)
+                    CACHE.clear()
+                    saved += 1
+
+                    # Har 10 ta saqlanganida xabar
+                    if saved % 10 == 0:
+                        await bot.edit_message_text(
+                            f"⏳ Jarayon davom etmoqda...\n✅ Saqlandi: {saved} ta",
+                            ADMIN_ID,
+                            status_msg.message_id
+                        )
+
+                    await asyncio.sleep(2.5)  # 2.5 sekund kutish
+
+                try:
+                    await bot.delete_message(ADMIN_ID, forwarded.message_id)
+                except:
+                    pass
+
+            except Exception:
+                skipped += 1
+                await asyncio.sleep(0.3)
+                continue
+
+        # Yakuniy hisobot
+        await bot.send_message(
+            ADMIN_ID,
+            f"✅ <b>Jarayon yakunlandi!</b>\n\n"
+            f"📡 Kanal: @{channel}\n"
+            f"📅 {date_from.strftime('%d.%m.%Y')} — {date_to.strftime('%d.%m.%Y')}\n\n"
+            f"💾 Saqlandi: <b>{saved} ta</b>\n"
+            f"⏭ O'tkazildi: <b>{skipped} ta</b>\n\n"
+            f"🗓 Sana: {datetime.now().strftime('%d.%m.%Y %H:%M')}",
+            parse_mode="HTML"
+        )
+
+    except Exception as e:
+        await bot.send_message(ADMIN_ID, f"❌ Xato yuz berdi: {e}")
+
 
 async def main():
     await database.setup_db() 
