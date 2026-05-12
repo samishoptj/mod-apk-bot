@@ -45,27 +45,35 @@ class BotStates(StatesGroup):
 
 MESSAGES = {
     'uz': {
-        'welcome': "Salom! Men aqlli APK botman. 🤖\n\nMenga quyidagicha murojaat qilishingiz mumkin:\n1️⃣ O'yin nomini yozing (masalan: Minecraft)\n2️⃣ O'yinni tasvirlang (masalan: 'poyga o'yini')\n3️⃣ Skrinshot yuboring!",
-        'not_found': f"Afsuski, bu ilova hozircha bazada yo'q. Men adminga xabar berdim, tez orada qo'shiladi! \n\nXavotir olmang, admin juda tez vaqt ichida bu ilovani qo'shadi. Yoki agar xohlasangiz, o'zingiz to'g'ridan-to'g'ri admin bilan bog'lanishingiz mumkin 👉 <a href='tg://user?id={ADMIN_ID}'>Admin Profiliga O'tish</a>",
+        'welcome': "Salom! Men aqlli APK botman. 🤖\n\n1️⃣ O'yin nomini yozing\n2️⃣ O'yinni tasvirlang\n3️⃣ Skrinshot yuboring!",
+        'not_found': f"Afsuski, bu ilova bazada yo'q. Admin tez orada qo'shadi! 👉 <a href='tg://user?id={ADMIN_ID}'>Admin</a>",
         'searching': "🔍 Qidiryapman...",
-        'lang_name': 'Uzbek'
+        'not_in_db': "Bazada yo'q",
+        'creator': "Meni Sami yaratgan.",
+        'lang_name': 'o\'zbek'
     },
     'ru': {
-        'welcome': "Привет! Я умный APK бот. 🤖\n\nВы можете искать так:\n1️⃣ Напишите название\n2️⃣ Опишите игру\n3️⃣ Пришлите скриншот!",
-        'not_found': f"Этого приложения пока нет в базе. Я сообщил админу, скоро добавим! Вы также можете написать админу напрямую 👉 <a href='tg://user?id={ADMIN_ID}'>Связаться с Админом</a>",
+        'welcome': "Привет! Я умный APK бот. 🤖\n\n1️⃣ Напишите название игры\n2️⃣ Опишите игру\n3️⃣ Пришлите скриншот!",
+        'not_found': f"Этого приложения нет в базе. Админ скоро добавит! 👉 <a href='tg://user?id={ADMIN_ID}'>Админ</a>",
         'searching': "🔍 Ищу...",
-        'lang_name': 'Russian'
+        'not_in_db': "Нет в базе",
+        'creator': "Меня создал Сами.",
+        'lang_name': 'русский'
     },
     'tj': {
-        'welcome': "Салом! Ман боти интеллектуалии APK ҳастам. 🤖",
-        'not_found': f"Мутаассифона, ин барнома дар база нест. Шумо метавонед ба админ нависед 👉 <a href='tg://user?id={ADMIN_ID}'>Админ</a>",
+        'welcome': "Салом! Ман боти APK ҳастам. 🤖\n\n1️⃣ Номи бозиро нависед\n2️⃣ Бозиро тавсиф кунед\n3️⃣ Скриншот фиристед!",
+        'not_found': f"Ин барнома дар база нест. Админ зуд илова мекунад! 👉 <a href='tg://user?id={ADMIN_ID}'>Админ</a>",
         'searching': "🔍 Ҷустуҷӯ дорам...",
-        'lang_name': 'Tajik'
+        'not_in_db': "Дар база нест",
+        'creator': "Маро Сами офаридааст.",
+        'lang_name': 'тоҷикӣ'
     },
     'en': {
-        'welcome': "Hello! I am a smart APK bot. 🤖",
-        'not_found': f"Unfortunately, this app is not in the database yet. Contact admin 👉 <a href='tg://user?id={ADMIN_ID}'>Admin</a>",
+        'welcome': "Hello! I am a smart APK bot. 🤖\n\n1️⃣ Write the game name\n2️⃣ Describe the game\n3️⃣ Send a screenshot!",
+        'not_found': f"This app is not in the database. Admin will add it soon! 👉 <a href='tg://user?id={ADMIN_ID}'>Admin</a>",
         'searching': "🔍 Searching...",
+        'not_in_db': "Not in database",
+        'creator': "I was created by Sami.",
         'lang_name': 'English'
     }
 }
@@ -257,28 +265,29 @@ async def handle_text_ai(message: types.Message, state: FSMContext):
 
     await bot.send_chat_action(chat_id=message.chat.id, action=ChatAction.TYPING)
     
+    creator_info = MESSAGES[lang_code]['creator']
     prompt = f"""
-    Sen Telegram botning o'ta aqlli Sun'iy Intellekti (AI) yordamchisisan.
-    Foydalanuvchi tili: {ai_lang_name}. Foydalanuvchi yozdi: '{query}'
+    Sen Telegram botning aqlli yordamchisissan. 
+    MUHIM: Faqat {ai_lang_name} tilida javob ber. Boshqa hech qanday tilda yozma. Hech qachon!
+    Foydalanuvchi yozdi: '{query}'
 
-    VAZIFANG quyidagi 3 ta holatdan eng mosini tanlab, STROGIY FORMATDA javob berish:
+    Agar foydalanuvchi "kim yaratgan", "who made you", "кто тебя создал", "ки туро офарид" kabi savol bersa:
+    SUHBAT: {creator_info}
 
-    1-HOLAT: Agar foydalanuvchi ilova/o'yin nomini yozgan bo'lsa (hatto gap ichida bo'lsa ham: "salom menga GTA kerak").
-    Format:
-    NOM: [Faqat o'yin nomi] | JAVOB: [Suhbatdosh sifatida qisqa, do'stona javob]
+    Qolgan holatlarda quyidagi 3 ta formatdan birini tanla:
 
-    2-HOLAT: Agar foydalanuvchi nomini bilmasdan o'yinni ta'riflasa yoki maslahat so'rasa.
-    Format:
+    1-HOLAT: Agar o'yin/ilova nomi yozilgan bo'lsa:
+    NOM: [Faqat o'yin nomi] | JAVOB: [Qisqa do'stona javob, faqat {ai_lang_name} tilida]
+
+    2-HOLAT: Agar o'yinni ta'riflasa yoki maslahat so'rasa:
     TA'RIF: 
-    [Do'stona qisqa gap]
+    [Qisqa gap, faqat {ai_lang_name} tilida]
     1. <b>[Nomi 1]</b> — [Qisqa ta'rif]
     2. <b>[Nomi 2]</b> — [Qisqa ta'rif]
     3. <b>[Nomi 3]</b> — [Qisqa ta'rif]
-    [Shulardan qaysi biri kerak deb so'ra]
 
-    3-HOLAT: Agar u shunchaki "salom", "qandaysan" desa yoki oldingi o'yinlarni "yo'q bular emas" deb rad etsa.
-    Format:
-    SUHBAT: [Suhbatga mos do'stona javob. Agar rad etsa: "Tushunarli, adminga xabar berdim" mazmunida yoz].
+    3-HOLAT: Agar salom, qandaysan kabi suhbat bo'lsa:
+    SUHBAT: [Do'stona qisqa javob, faqat {ai_lang_name} tilida]
     """
     
     try:
